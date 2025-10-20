@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>This is Edplore</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #fafafa;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1rem;
+      color: #555;
+    }
+    .loading {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>This is Edplore</h1>
+  <p>Loading your rhyme video...</p>
+  <div class="loading">Please wait a moment...</div>
+
+  <script>
+    // Extract ?id=001 from the URL
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (id) {
+      // Your Google Apps Script Web App link
+      const scriptURL =
+        'https://script.google.com/macros/s/AKfycbxUkSauyTqkF0Nu9q9Z6lrTrBCs2tRjyxjm08LjJwQkdq-lhgXdgTgbAMkm9nSYOrEx/exec?id=' + id + '&direct=true';
+
+      // Redirect after 1.5 seconds
+      setTimeout(() => {
+        window.location.href = scriptURL;
+      }, 1500);
+    } else {
+      document.body.innerHTML = "<h2>Invalid QR code link.</h2>";
+    }
+  </script>
+</body>
+</html>
