@@ -111,11 +111,12 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxUkSauyTqkF0Nu9q9Z6lrTrBCs2tRjyxjm08LjJwQkdq-lhgXdgTgbAMkm9nSYOrEx/exec';
-    
-    function getQRId() {
+    function getParams() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('id');
+      return {
+        id: params.get('id'),
+        video: params.get('video')
+      };
     }
     
     function showError(message) {
@@ -129,24 +130,25 @@
     }
     
     function redirectToVideo() {
-      const id = getQRId();
+      const { id, video } = getParams();
       
-      if (!id) {
-        showError('Invalid or missing QR ID. Please scan a valid QR code.');
+      if (!video) {
+        showError('Invalid QR code. Video link not found.');
         return;
       }
       
-      // Pad ID to 3 digits (1 → 001)
-      const paddedId = String(id).padStart(3, '0');
+      // Decode the YouTube URL
+      const youtubeUrl = decodeURIComponent(video);
       
-      // Build redirect URL
-      const redirectURL = `${SCRIPT_URL}?id=${paddedId}&direct=true`;
+      console.log('QR ID:', id);
+      console.log('Redirecting to:', youtubeUrl);
       
-      console.log('Redirecting to:', redirectURL);
+      // Update message
+      document.getElementById('message').textContent = 'Opening video...';
       
       // Redirect after 1 second
       setTimeout(() => {
-        window.location.href = redirectURL;
+        window.location.href = youtubeUrl;
       }, 1000);
     }
     
