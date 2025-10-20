@@ -15,19 +15,9 @@
       font-family: Arial, sans-serif;
       color: #333;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    p {
-      font-size: 1rem;
-      color: #555;
-    }
-    .loading {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-      color: #888;
-    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    p { font-size: 1rem; color: #555; }
+    .loading { margin-top: 1rem; color: #777; }
   </style>
 </head>
 <body>
@@ -36,21 +26,14 @@
   <div class="loading">Please wait a moment...</div>
 
   <script>
-    // Extract ?id=001 from the URL
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-
     if (id) {
-      // Your Google Apps Script Web App link
-      const scriptURL =
-        'https://script.google.com/macros/s/AKfycbxUkSauyTqkF0Nu9q9Z6lrTrBCs2tRjyxjm08LjJwQkdq-lhgXdgTgbAMkm9nSYOrEx/exec?id=' + id + '&direct=true';
-
-      // Redirect after 1.5 seconds
-      setTimeout(() => {
-        window.location.href = scriptURL;
-      }, 1500);
+      // Call Apps Script with direct=true to go straight to YouTube
+      const redirectURL = 'https://script.google.com/macros/s/AKfycbxUkSauyTqkF0Nu9q9Z6lrTrBCs2tRjyxjm08LjJwQkdq-lhgXdgTgbAMkm9nSYOrEx/exec?id=' + id + '&direct=true';
+      setTimeout(() => { window.location.href = redirectURL; }, 1000);
     } else {
-      document.body.innerHTML = "<h2>Invalid QR code link.</h2>";
+      document.body.innerHTML = "<h2>Invalid or missing QR ID.</h2>";
     }
   </script>
 </body>
