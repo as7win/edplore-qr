@@ -136,6 +136,19 @@
       color: #742a2a;
     }
     
+    .debug {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: left;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
     .footer {
       background: rgba(255, 255, 255, 0.1);
       color: white;
@@ -227,6 +240,7 @@
   <div class="main">
     <div class="container" id="content">
       <div class="video-icon">🎬</div>
+      <div id="qr-badge" style="display: inline-block; background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; font-size: 0.9rem;">QR #<span id="qr-id">---</span></div>
       <h2 id="rhyme-title">Get Ready to Learn!</h2>
       <p id="message">Fetching your personalized video...</p>
       
@@ -252,6 +266,8 @@
           <p>Colorful learning</p>
         </div>
       </div>
+      
+      <div class="debug" id="debug" style="display: none;"></div>
     </div>
   </div>
 
@@ -265,14 +281,17 @@
       return {
         id: params.get('id'),
         sheet: params.get('sheet'),
-        // Legacy support for direct video links
         name: params.get('name'),
         video: params.get('video')
       };
     }
     
-    function showError(message) {
+    function showError(message, debugInfo = null) {
       const content = document.getElementById('content');
+      let debugHtml = '';
+      if (debugInfo) {
+        debugHtml = `<div class="debug">${debugInfo}</div>`;
+      }
       content.innerHTML = `
         <div class="video-icon">⚠️</div>
         <div class="error">
@@ -280,12 +299,40 @@
           <p>${message}</p>
           <p style="margin-top: 15px; font-size: 0.9rem;">Please try scanning the QR code again or contact support.</p>
         </div>
+        ${debugHtml}
       `;
+    }
+    
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      
+      return result.map(field => field.trim());
     }
     
     async function fetchVideoFromSheet(sheetId, qrId) {
       try {
-        // Fetch data from public Google Sheet
         const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
         const response = await fetch(csvUrl);
         
@@ -294,28 +341,38 @@
         }
         
         const csvText = await response.text();
-        const rows = csvText.split('\n').map(row => row.split(','));
+        const lines = csvText.split('\n').filter(line => line.trim());
         
-        // Find column indices
-        const header = rows[0];
-        const idIndex = header.findIndex(col => col.includes('QR Code ID'));
-        const nameIndex = header.findIndex(col => col.includes('Rhyme Name'));
-        const linkIndex = header.findIndex(col => col.includes('YouTube Link'));
-        
-        if (idIndex === -1 || nameIndex === -1 || linkIndex === -1) {
-          throw new Error('Required columns not found in sheet');
+        if (lines.length < 2) {
+          throw new Error('Sheet appears to be empty');
         }
         
-        // Find the row matching the QR ID
+        const header = parseCSVLine(lines[0]);
+        const idIndex = header.findIndex(col => col.toLowerCase().includes('qr code id'));
+        const nameIndex = header.findIndex(col => col.toLowerCase().includes('rhyme name'));
+        const linkIndex = header.findIndex(col => col.toLowerCase().includes('youtube link'));
+        
+        if (idIndex === -1 || nameIndex === -1 || linkIndex === -1) {
+          throw new Error(`Required columns not found. Found: ${header.join(', ')}`);
+        }
+        
         const normalizedId = String(qrId).padStart(3, '0');
         
-        for (let i = 1; i < rows.length; i++) {
-          const rowId = String(rows[i][idIndex]).trim().padStart(3, '0');
+        for (let i = 1; i < lines.length; i++) {
+          const row = parseCSVLine(lines[i]);
+          const rowId = String(row[idIndex] || '').trim().padStart(3, '0');
           
           if (rowId === normalizedId) {
+            const videoLink = (row[linkIndex] || '').trim();
+            const rhymeName = (row[nameIndex] || '').trim();
+            
+            if (!videoLink || !videoLink.startsWith('http')) {
+              throw new Error(`Invalid or missing video link for "${rhymeName}"`);
+            }
+            
             return {
-              name: rows[i][nameIndex].trim().replace(/"/g, ''),
-              video: rows[i][linkIndex].trim().replace(/"/g, '')
+              name: rhymeName,
+              video: videoLink
             };
           }
         }
@@ -331,7 +388,7 @@
     async function redirectToVideo() {
       const { id, sheet, name, video } = getParams();
       
-      // Legacy mode: direct video link in URL
+      // Legacy mode
       if (video) {
         const youtubeUrl = decodeURIComponent(video);
         const rhymeName = name ? decodeURIComponent(name) : 'Your Rhyme';
@@ -341,11 +398,11 @@
         
         setTimeout(() => {
           window.location.href = youtubeUrl;
-        }, 2000);
+        }, 1500);
         return;
       }
       
-      // New mode: fetch from sheet
+      // New mode
       if (!id || !sheet) {
         showError('Invalid QR code. Missing ID or sheet information.');
         return;
@@ -361,25 +418,22 @@
           return;
         }
         
-        // Update page
         document.getElementById('rhyme-title').textContent = data.name;
         document.getElementById('message').textContent = `Let's watch ${data.name}!`;
         
-        console.log('QR ID:', id);
-        console.log('Rhyme:', data.name);
-        console.log('Video:', data.video);
+        console.log('✅ QR ID:', id);
+        console.log('✅ Rhyme:', data.name);
+        console.log('✅ Video:', data.video);
         
-        // Redirect to YouTube
         setTimeout(() => {
           window.location.href = data.video;
-        }, 2000);
+        }, 1500);
         
       } catch (error) {
-        showError(error.message);
+        showError(error.message, `Debug Info:<br>Sheet ID: ${sheet}<br>QR ID: ${id}<br>Error: ${error.message}`);
       }
     }
     
-    // Start
     redirectToVideo();
   </script>
 </body>
