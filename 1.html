@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Edplore - Personalized Learning</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo {
+      font-size: 2.5rem;
+      animation: bounce 2s infinite;
+    }
+    
+    .brand {
+      flex: 1;
+    }
+    
+    .brand h1 {
+      color: #667eea;
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+    
+    .brand p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 50px 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    
+    .video-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    .container h2 {
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    
+    .container p {
+      color: #666;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    
+    .qr-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      margin: 15px 0;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+      background: #f0f0f0;
+      border-radius: 10px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    .loading-text {
+      color: #666;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .teacher-container {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .teacher-container h2 {
+      color: white;
+    }
+    
+    .teacher-container p {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .watch-button {
+      display: inline-block;
+      background: white;
+      color: #667eea;
+      padding: 15px 40px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .watch-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .watch-button:active {
+      transform: translateY(0);
+    }
+    
+    .error {
+      background: #fff5f5;
+      border: 2px solid #fc8181;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 20px;
+    }
+    
+    .error h3 {
+      color: #c53030;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    
+    .error p {
+      color: #742a2a;
+    }
+    
+    .footer {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .feature {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .teacher-container .feature {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .feature h4 {
+      color: white;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+    
+    .feature p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.8rem;
+      margin: 0;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .brand h1 {
+        font-size: 1.5rem;
+      }
+      
+      .container {
+        padding: 30px 20px;
+      }
+      
+      .container h2 {
+        font-size: 1.5rem;
+      }
+      
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="logo">📚</div>
+      <div class="brand">
+        <h1>Edplore</h1>
+        <p>Personalized Books & Learning for Preschoolers</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="container" id="content">
+      <div class="video-icon">🎬</div>
+      <h2 id="title">Get Ready to Learn!</h2>
+      <div class="qr-badge">QR Code #<span id="qr-id">---</span></div>
+      <p id="message">Loading...</p>
+      
+      <div class="loading">
+        <div class="spinner"></div>
+        <span class="loading-text">Loading...</span>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🎵</div>
+          <h4>Fun Rhymes</h4>
+          <p>Engaging songs</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📖</div>
+          <h4>Story Time</h4>
+          <p>Interactive tales</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🎨</div>
+          <h4>Creative</h4>
+          <p>Colorful learning</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Edplore - Making Learning Fun for Every Child</p>
+  </div>
+
+  <script>
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        type: params.get('type'),
+        id: params.get('id'),
+        sheet: params.get('sheet')
+      };
+    }
+    
+    function showError(message) {
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="video-icon">⚠️</div>
+        <div class="error">
+          <h3>Oops! Something went wrong</h3>
+          <p>${message}</p>
+          <p style="margin-top: 15px; font-size: 0.9rem;">Please try scanning the QR code again or contact support.</p>
+        </div>
+      `;
+    }
+    
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      
+      return result.map(field => field.trim());
+    }
+    
+    async function fetchFromSheet(sheetId, qrId, type) {
+      try {
+        const gid = type === 'parent' ? '0' : '1'; // 0 = first sheet, 1 = second sheet
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+        const response = await fetch(csvUrl);
+        
+        if (!response.ok) {
+          throw new Error('Could not access sheet. Make sure it is public!');
+        }
+        
+        const csvText = await response.text();
+        const lines = csvText.split('\n').filter(line => line.trim());
+        
+        if (lines.length < 2) {
+          throw new Error('Sheet appears to be empty');
+        }
+        
+        const header = parseCSVLine(lines[0]);
+        const idIndex = header.findIndex(col => col.toLowerCase().includes('qr code id'));
+        const nameIndex = header.findIndex(col => 
+          col.toLowerCase().includes('rhyme name') || 
+          col.toLowerCase().includes('training topic')
+        );
+        const linkIndex = header.findIndex(col => 
+          col.toLowerCase().includes('youtube link') || 
+          col.toLowerCase().includes('training link')
+        );
+        
+        if (idIndex === -1 || nameIndex === -1 || linkIndex === -1) {
+          throw new Error(`Required columns not found. Found: ${header.join(', ')}`);
+        }
+        
+        const normalizedId = String(qrId).padStart(3, '0');
+        
+        for (let i = 1; i < lines.length; i++) {
+          const row = parseCSVLine(lines[i]);
+          const rowId = String(row[idIndex] || '').trim().padStart(3, '0');
+          
+          if (rowId === normalizedId) {
+            const link = (row[linkIndex] || '').trim();
+            const name = (row[nameIndex] || '').trim();
+            
+            if (!link || !link.startsWith('http')) {
+              throw new Error(`Invalid or missing link for "${name}"`);
+            }
+            
+            return { name, link };
+          }
+        }
+        
+        throw new Error(`QR Code #${qrId} not found in sheet`);
+        
+      } catch (error) {
+        console.error('Error fetching from sheet:', error);
+        throw error;
+      }
+    }
+    
+    function showTeacherPage(qrId, name, videoLink) {
+      const content = document.getElementById('content');
+      content.className = 'container teacher-container';
+      
+      content.innerHTML = `
+        <div class="video-icon">👩‍🏫</div>
+        <h2>Edplore Teachers Training</h2>
+        <div class="qr-badge">QR Code #${qrId}</div>
+        <p style="font-size: 1.3rem; margin: 20px 0;"><strong>${name}</strong></p>
+        <p>Access professional training materials to enhance your teaching skills and create amazing learning experiences for your students.</p>
+        
+        <button class="watch-button" onclick="window.location.href='${videoLink}'">
+          ▶️ Watch Training Video
+        </button>
+        
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">🎓</div>
+            <h4>Expert Training</h4>
+            <p>Learn from pros</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">💡</div>
+            <h4>Best Practices</h4>
+            <p>Proven methods</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🚀</div>
+            <h4>Level Up</h4>
+            <p>Grow your skills</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    async function handleRedirect() {
+      const { type, id, sheet } = getParams();
+      
+      if (!type || !id || !sheet) {
+        showError('Invalid QR code. Missing required information.');
+        return;
+      }
+      
+      // Show QR ID
+      document.getElementById('qr-id').textContent = String(id).padStart(3, '0');
+      
+      try {
+        document.getElementById('message').textContent = 'Fetching latest information...';
+        
+        const data = await fetchFromSheet(sheet, id, type);
+        
+        if (!data.link) {
+          showError(`No link assigned to "${data.name}". Please update your sheet.`);
+          return;
+        }
+        
+        if (type === 'teacher') {
+          // Show teacher training page with button
+          showTeacherPage(String(id).padStart(3, '0'), data.name, data.link);
+        } else {
+          // Parent mode: auto-redirect to video
+          document.getElementById('title').textContent = data.name;
+          document.getElementById('message').textContent = `Let's watch ${data.name}!`;
+          
+          console.log('✅ QR ID:', id);
+          console.log('✅ Name:', data.name);
+          console.log('✅ Link:', data.link);
+          
+          setTimeout(() => {
+            window.location.href = data.link;
+          }, 1500);
+        }
+        
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    handleRedirect();
+  </script>
+</body>
+</html>
