@@ -240,8 +240,8 @@
   <div class="main">
     <div class="container" id="content">
       <div class="video-icon">🎬</div>
-      <div id="qr-badge" style="display: inline-block; background: #667eea; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; font-size: 0.9rem;">QR #<span id="qr-id">---</span></div>
       <h2 id="rhyme-title">Get Ready to Learn!</h2>
+      <div id="qr-badge" style="display: inline-block; background: #667eea; color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold; margin: 15px 0; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">QR Code #<span id="qr-id">---</span></div>
       <p id="message">Fetching your personalized video...</p>
       
       <div class="loading">
@@ -387,6 +387,11 @@
     
     async function redirectToVideo() {
       const { id, sheet, name, video } = getParams();
+      
+      // Show QR ID if available
+      if (id) {
+        document.getElementById('qr-id').textContent = String(id).padStart(3, '0');
+      }
       
       // Legacy mode
       if (video) {
